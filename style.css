@@ -1,0 +1,527 @@
+/* =========================================================
+   Halloweenowy kociołek czarownicy – przygoda w 6 próbach
+   Scena 1920 × 1080 px, skalowana w JS do rozmiaru okna/iframe.
+   ========================================================= */
+
+:root {
+  --gold: #ffc93c;
+  --gold-dark: #c9780c;
+  --purple: #5b1d8f;
+  --purple-mid: #7a2fc0;
+  --purple-deep: #2a0e45;
+  --cream: #fff4dc;
+  --parchment: #fbe9c6;
+  --ink: #3a145e;
+  --oops: #8a1f3c;
+  --ok: #3f8f1c;
+  --night: #170a28;
+  --font: "Baloo 2", "Fredoka", "Nunito", "Arial Rounded MT Bold", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--night);
+  color: var(--cream);
+  font-family: var(--font);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+#viewport {
+  position: fixed;
+  left: 0; right: 0;
+  top: env(safe-area-inset-top, 0px);
+  bottom: env(safe-area-inset-bottom, 0px);
+  overflow: hidden;
+  background: radial-gradient(ellipse at center, #2b1247 0%, #120720 100%);
+}
+
+#stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: 50% 50%;
+  transform: translate(-50%, -50%) scale(var(--scale, 0.5));
+  overflow: hidden;
+}
+
+#stage img { display: block; max-width: none; -webkit-user-drag: none; }
+
+.sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0);
+  white-space: nowrap; border: 0;
+}
+
+/* ---------- Ekrany ---------- */
+.screen { position: absolute; inset: 0; opacity: 0; transition: opacity .5s ease; }
+.screen.is-active { opacity: 1; }
+.screen[hidden] { display: none; }
+.screen > * { position: absolute; }
+.bg { inset: 0; width: 1920px; height: 1080px; object-fit: cover; }
+
+/* Dekoracje nie przechwytują kliknięć */
+.deco, .deco *, .fx, .fly-layer, .bg, .game-witch, .game-witch *, .try-again, .reward, .reward *,
+.start-witch, .start-cauldron, .end-witch, .start-title, .start-instruction, .game-banner, .say, .progress {
+  pointer-events: none;
+}
+
+/* ---------- Przyciski graficzne ---------- */
+.img-btn {
+  padding: 0; margin: 0; border: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 60px;
+  touch-action: manipulation;
+  transition: transform .2s ease, filter .3s ease, opacity .3s ease;
+}
+.img-btn img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+.img-btn:hover:not(:disabled) { transform: scale(1.05); }
+.img-btn:active:not(:disabled) { transform: scale(.96); }
+.img-btn:disabled { cursor: default; filter: grayscale(.75) brightness(.8); opacity: .55; }
+.img-btn:focus, .round-btn:focus, .pill-btn:focus, .tile:focus, .card:focus, .sprite:focus { outline: none; }
+.img-btn:focus-visible, .round-btn:focus-visible, .pill-btn:focus-visible { outline: 6px solid var(--gold); outline-offset: 6px; }
+[hidden] { display: none !important; }
+
+/* Przycisk tekstowy w stylu gry (ZAPAMIĘTAŁEM/AM, GOTOWE, tryb spokojny) */
+.pill-btn {
+  position: absolute;
+  min-height: 96px;
+  padding: 10px 46px 14px;
+  border: 6px solid var(--gold);
+  border-radius: 60px;
+  background: radial-gradient(ellipse at 50% 25%, #a65de6 0%, #6a22a8 55%, #47107a 100%);
+  box-shadow: 0 8px 0 var(--gold-dark), 0 14px 26px rgba(0,0,0,.45), inset 0 3px 0 rgba(255,255,255,.25);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  text-shadow: 0 3px 0 rgba(58,20,94,.7);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform .2s ease;
+}
+.pill-btn:hover { transform: scale(1.04); }
+.pill-btn:active { transform: scale(.97); }
+.pill-btn.small { min-height: 70px; padding: 6px 28px 10px; font-size: 30px; border-width: 5px; box-shadow: 0 6px 0 var(--gold-dark), 0 10px 18px rgba(0,0,0,.4); }
+.pill-btn[aria-pressed="true"] { background: radial-gradient(ellipse at 50% 25%, #8ee05a 0%, #3f8f1c 70%); }
+
+/* ---------- Menu główne ---------- */
+.start-title { left: 370px; top: 12px; width: 1180px; height: 395px; animation: float 5s ease-in-out infinite; }
+.start-witch { left: 90px; top: 400px; height: 650px; width: auto; }
+.start-cauldron { left: 1430px; top: 652px; width: 480px; }
+.start-instruction { left: 390px; top: 410px; width: 1140px; height: 269px; }
+.start-instruction img { width: 100%; height: 100%; }
+.start-instruction p {
+  position: absolute; left: 17.5%; right: 17.5%; top: 20%; bottom: 21%; margin: 0;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  font-size: 29px; line-height: 1.22; font-weight: 800; color: var(--ink);
+}
+.btn-start { left: 750px; top: 735px; width: 420px; height: 247px; }
+.btn-start:not(:disabled) { animation: pulse 2.4s ease-in-out infinite; }
+.loading { left: 0; right: 0; bottom: 18px; margin: 0; text-align: center; font-size: 30px; font-weight: 700; color: var(--cream); text-shadow: 0 2px 6px #000; }
+.loading.done { opacity: 0; transition: opacity .4s; }
+
+/* ---------- Wspólna rama gry ---------- */
+.btn-home { left: 28px; top: 26px; width: 124px; height: 102px; z-index: 80; }
+
+.game-banner { left: 340px; top: 4px; width: 1240px; height: 292px; z-index: 12; }
+.game-banner img { width: 100%; height: 100%; }
+.game-banner h1 {
+  position: absolute; left: 18%; right: 18%; top: 21%; bottom: 22%; margin: 0;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  font-size: 36px; line-height: 1.12; font-weight: 800; color: var(--ink);
+  text-wrap: balance;
+}
+
+.progress {
+  left: 1594px; top: 30px; width: 300px;
+  padding: 12px 14px 14px;
+  border-radius: 30px;
+  background: linear-gradient(180deg, #7a2fc0 0%, #4a1478 100%);
+  border: 5px solid var(--gold);
+  box-shadow: 0 6px 0 var(--gold-dark), 0 10px 24px rgba(0,0,0,.45);
+  color: #fff; text-align: center; font-weight: 800; line-height: 1;
+  z-index: 8;
+}
+.progress-label { display: block; font-size: 27px; white-space: nowrap; }
+.inventory { display: flex; justify-content: center; gap: 4px; margin-top: 10px; }
+.inventory i {
+  position: relative;
+  width: 42px; height: 42px; border-radius: 50%;
+  background: rgba(255,255,255,.14);
+  border: 3px solid rgba(255,214,120,.55);
+  transition: background .4s, transform .4s;
+}
+.inventory i img { position: absolute; inset: 2px; width: 32px; height: 32px; object-fit: contain; }
+.inventory i.on { background: radial-gradient(circle, #fff1c2 0%, #ffc93c 100%); transform: scale(1.1); }
+
+.game-witch { left: 20px; top: 470px; width: 440px; height: 590px; z-index: 6; }
+.game-witch img { position: absolute; bottom: 0; left: 50%; height: 100%; width: auto; transform: translateX(-50%); transition: opacity .45s ease; }
+.game-witch .witch-b { opacity: 0; }
+.game-witch.is-happy .witch-a { opacity: 0; }
+.game-witch.is-happy .witch-b { opacity: 1; animation: hop .9s ease-out 1; }
+
+/* Dymek czarownicy */
+.say {
+  left: 28px; top: 280px; width: 440px; min-height: 120px;
+  padding: 18px 24px;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  font-size: 32px; line-height: 1.15; font-weight: 800; color: var(--ink);
+  background: radial-gradient(ellipse at 50% 30%, #fffaf0 0%, #ffe9bd 100%);
+  border: 5px solid var(--gold);
+  border-radius: 36px;
+  box-shadow: 0 6px 0 var(--gold-dark), 0 14px 26px rgba(0,0,0,.4);
+  z-index: 30;
+  opacity: 0; transform: scale(.6); transform-origin: 30% 100%;
+  transition: opacity .3s ease, transform .4s cubic-bezier(.34,1.56,.64,1);
+}
+.say::after {
+  content: ""; position: absolute; left: 150px; bottom: -30px;
+  border: 16px solid transparent; border-top: 18px solid var(--gold);
+}
+.say.show { opacity: 1; transform: scale(1); }
+.say.oops { color: var(--oops); }
+
+.board { left: 0; top: 0; width: 1920px; height: 1080px; pointer-events: none; z-index: 10; }
+.board > * { position: absolute; pointer-events: auto; }
+.board .deco, .board .fx { pointer-events: none; }
+
+.try-again {
+  left: 750px; top: 380px; width: 420px; z-index: 40;
+  opacity: 0; transform: scale(.5);
+  transition: opacity .3s ease, transform .45s cubic-bezier(.34,1.56,.64,1);
+}
+.try-again.show { opacity: 1; transform: scale(1); }
+
+.btn-next { left: 1545px; top: 905px; width: 345px; height: 121px; z-index: 45; animation: popIn .5s cubic-bezier(.34,1.56,.64,1) both, pulse 2.2s ease-in-out .6s infinite; }
+
+.fly-layer { inset: 0; z-index: 60; }
+.fly { position: absolute; left: 0; top: 0; object-fit: contain; filter: drop-shadow(0 12px 14px rgba(0,0,0,.5)); will-change: transform; }
+
+/* Wprowadzenie do próby */
+.intro { inset: 0; z-index: 70; background: rgba(23,10,40,.62); animation: fadeIn .35s ease both; }
+.intro-card { position: absolute; left: 470px; top: 96px; width: 980px; height: 730px; }
+.intro-frame { position: absolute; inset: 0; width: 100%; height: 100%; }
+.intro-card::before {
+  content: ""; position: absolute; left: 14%; right: 14%; top: 21%; bottom: 15%;
+  border-radius: 40px;
+  background: radial-gradient(ellipse at 50% 35%, #fffaf0 0%, var(--parchment) 100%);
+}
+.intro-body {
+  position: absolute; left: 18%; right: 18%; top: 25%; bottom: 17%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  text-align: center; color: var(--ink);
+}
+.intro-step { margin: 0; font-size: 24px; font-weight: 800; color: var(--purple-mid); letter-spacing: .04em; text-transform: uppercase; }
+.intro-title { margin: 0; font-size: 46px; line-height: 1.05; font-weight: 800; color: var(--purple); text-wrap: balance; }
+.intro-text { margin: 0; font-size: 29px; line-height: 1.22; font-weight: 700; text-wrap: balance; }
+.intro-reward { display: flex; align-items: center; gap: 16px; font-size: 30px; font-weight: 800; color: var(--purple-mid); }
+.intro-reward span { line-height: 1.1; text-align: center; }
+.intro-reward img { width: 96px; height: 96px; object-fit: contain; filter: drop-shadow(0 6px 8px rgba(0,0,0,.35)); }
+.btn-go { position: absolute; left: 790px; top: 836px; width: 340px; height: 200px; animation: pulse 2.4s ease-in-out infinite; }
+
+/* Nagroda */
+.reward { left: 770px; top: 330px; width: 380px; height: 420px; z-index: 50; opacity: 0; transition: opacity .3s ease; }
+.reward img { position: absolute; }
+.reward-img { left: 70px; top: 90px; width: 240px; height: 240px; object-fit: contain; filter: drop-shadow(0 10px 14px rgba(0,0,0,.5)); transition: opacity .2s; }
+/* jeden efekt wokół nagrody: pojawia się (0,5 s), trwa ok. 2 s, znika (0,5 s) */
+.reward-fx { opacity: 0; transition: opacity .5s ease; }
+.reward-spark { left: 95px; top: 30px; width: 190px; }
+.reward-bubbles { left: 120px; top: 20px; width: 140px; }
+.reward-mist { left: 90px; top: 150px; width: 200px; }
+.reward.fx-spark .reward-spark { opacity: .7; animation: twinkle 2s ease-in-out 1; }
+.reward.fx-bubbles .reward-bubbles { opacity: .7; animation: bubblesRise 2s ease-out 1; }
+.reward.fx-mist .reward-mist { opacity: .5; animation: mistDrift 2s ease-in-out 1; }
+.reward.show { opacity: 1; }
+
+/* ---------- Kociołek (komponent wielokrotnego użytku) ---------- */
+.cauldron { width: 480px; height: 470px; pointer-events: none !important; }
+.cauldron > * { position: absolute; }
+.cauldron-body { left: 0; bottom: 0; width: 480px; height: 500px; z-index: 3; transform-origin: 50% 100%; }
+.cauldron-img { position: absolute; left: 0; bottom: 0; width: 480px; transition: opacity .6s ease; }
+.cauldron-active { opacity: 0; }
+.cauldron.is-active .cauldron-active { opacity: 1; }
+.cauldron.is-active .cauldron-base { opacity: 0; }
+.cauldron.is-over .cauldron-body { filter: drop-shadow(0 0 28px rgba(160,255,90,.85)); }
+.cauldron-body.wobble { animation: wobble .9s ease-in-out 1; }
+.cauldron .fx { opacity: 0; transition: opacity .5s ease; filter: hue-rotate(var(--fxhue, 0deg)); z-index: 5; }
+/* jeden efekt naraz, nad wlotem kociołka: mały, półprzezroczysty, ok. 2 s */
+.cauldron .fx-spark   { left: 150px; top: -60px; width: 180px; }
+.cauldron .fx-bubbles { left: 170px; top: -40px; width: 140px; }
+.cauldron .fx-mist    { left: 140px; top: -20px; width: 200px; }
+.cauldron.fx-spark-on .fx-spark { opacity: .7; animation: twinkle 2s ease-in-out 1; }
+.cauldron.fx-bubbles-on .fx-bubbles { opacity: .7; animation: bubblesRise 2s ease-out 1; }
+.cauldron.fx-mist-on .fx-mist { opacity: .5; animation: mistDrift 2s ease-in-out 1; }
+
+/* ---------- Kafelki z przedmiotami (wspólne) ---------- */
+.tile {
+  position: absolute;
+  width: 210px; height: 210px;
+  padding: 0; border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  touch-action: none;
+  background: radial-gradient(circle at 50% 55%, rgba(255,233,170,.6) 0%, rgba(160,80,220,.45) 45%, rgba(60,20,100,0) 70%);
+  transition: transform .25s ease, opacity .35s ease, filter .3s ease;
+}
+.tile img {
+  position: absolute; left: 50%; top: 50%;
+  width: 180px; height: 180px;
+  object-fit: contain;               /* stałe pole – szerokie obrazki (np. cukierek) się nie rozjeżdżają */
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 8px 10px rgba(0,0,0,.45));
+  pointer-events: none;
+}
+.tile:hover:not(:disabled), .tile:focus-visible { transform: translateY(-10px) scale(1.06); }
+.tile:focus-visible { outline: 6px solid var(--gold); outline-offset: 2px; }
+.tile.dragging img { opacity: .25; }
+.tile:disabled { cursor: default; }
+.tile.wrong { opacity: .35; filter: grayscale(.8); }
+.tile.used { opacity: 0; pointer-events: none; }
+.tile.pop { animation: popIn .55s cubic-bezier(.34,1.56,.64,1) backwards; }
+.tile.glow { filter: drop-shadow(0 0 22px rgba(255,214,90,.95)); }
+.tile.small { width: 170px; height: 170px; }
+.tile.small img { width: 146px; height: 146px; }
+
+/* Pergaminowy panel planszy */
+.panel {
+  border-radius: 44px;
+  background: radial-gradient(ellipse at 50% 30%, rgba(255,250,236,.96) 0%, rgba(251,233,198,.96) 100%);
+  border: 6px solid var(--gold);
+  box-shadow: 0 8px 0 var(--gold-dark), 0 0 0 10px rgba(122,47,192,.5), 0 20px 40px rgba(0,0,0,.45);
+}
+
+/* ---------- 2: MEMORY ---------- */
+.card {
+  position: absolute;
+  width: 210px; height: 250px;
+  padding: 0; border: 0; background: none;
+  cursor: pointer;
+  perspective: 900px;
+  touch-action: manipulation;
+}
+.card-inner { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .5s ease; }
+.card.flipped .card-inner, .card.matched .card-inner { transform: rotateY(180deg); }
+.card-face { position: absolute; inset: 0; border-radius: 26px; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.card-back {
+  border: 6px solid var(--gold);
+  background:
+    radial-gradient(circle at 50% 46%, transparent 0 46px, rgba(255,201,60,.0) 47px),
+    radial-gradient(circle, rgba(255,214,120,.35) 2px, transparent 3px) 0 0 / 28px 28px,
+    radial-gradient(ellipse at 50% 30%, #8a3fd0 0%, #4a1478 75%, #2f0b52 100%);
+  box-shadow: 0 8px 0 var(--gold-dark), 0 14px 24px rgba(0,0,0,.45), inset 0 0 0 6px rgba(42,14,69,.6);
+}
+/* złoty księżyc na rewersie (CSS) */
+.card-back::before {
+  content: ""; position: absolute; left: 50%; top: 46%;
+  width: 92px; height: 92px; margin: -46px 0 0 -46px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff0b0, #ffc93c 60%, #d98a0e);
+  box-shadow: 0 0 26px rgba(255,201,60,.7);
+}
+.card-back::after {
+  content: ""; position: absolute; left: 50%; top: 46%;
+  width: 80px; height: 80px; margin: -58px 0 0 -26px; border-radius: 50%;
+  background: #5a1c95;
+}
+.card-front {
+  transform: rotateY(180deg);
+  border: 6px solid var(--gold);
+  background: radial-gradient(ellipse at 50% 40%, #fffaf0 0%, var(--parchment) 100%);
+  box-shadow: 0 8px 0 var(--gold-dark), 0 14px 24px rgba(0,0,0,.4);
+}
+.card-front img { position: absolute; left: 50%; top: 50%; width: 170px; height: 170px; object-fit: contain; transform: translate(-50%, -50%); }
+.card.matched .card-front { box-shadow: 0 8px 0 var(--gold-dark), 0 0 0 8px rgba(120,220,60,.75), 0 0 34px rgba(160,255,90,.8); }
+.card:hover:not(.flipped):not(.matched) .card-inner { transform: translateY(-8px); }
+.card:focus-visible { outline: 6px solid var(--gold); outline-offset: 8px; border-radius: 26px; }
+
+/* ---------- 3: KOLEJNOŚĆ ---------- */
+.recipe { display: flex; align-items: center; justify-content: center; gap: 22px; }
+.recipe .slot {
+  position: relative; width: 210px; height: 210px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.recipe .slot img { width: 180px; height: 180px; object-fit: contain; filter: drop-shadow(0 8px 10px rgba(0,0,0,.35)); }
+.recipe .slot.empty { border: 6px dashed rgba(122,47,192,.55); background: rgba(122,47,192,.08); }
+.recipe .slot .num {
+  position: absolute; left: -6px; top: -6px;
+  width: 58px; height: 58px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--purple); color: #fff; font-size: 34px; font-weight: 800;
+  border: 4px solid var(--gold);
+}
+.recipe .slot.filled { animation: popIn .5s cubic-bezier(.34,1.56,.64,1) both; }
+.recipe .arrow { width: 64px; height: 44px; flex: none; }
+.recipe .arrow path { fill: var(--gold-dark); }
+.recipe-hidden { display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 800; color: var(--purple); }
+
+/* ---------- 4: CO ZNIKNĘŁO ---------- */
+.shelf { display: flex; align-items: center; justify-content: space-around; padding: 0 16px; }
+.shelf .spot { position: relative; width: 186px; height: 210px; display: flex; align-items: center; justify-content: center; transition: opacity .5s ease; }
+.shelf .spot img { width: 180px; height: 180px; object-fit: contain; filter: drop-shadow(0 8px 10px rgba(0,0,0,.35)); }
+.shelf .spot.gone img { opacity: 0; }
+.shelf .spot.gone::after {
+  content: "?"; position: absolute; inset: 20px; border-radius: 50%;
+  border: 6px dashed rgba(122,47,192,.55);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 90px; font-weight: 800; color: rgba(122,47,192,.6);
+}
+.shelf .spot.back img { opacity: 1; animation: popIn .6s cubic-bezier(.34,1.56,.64,1) both; }
+.shelf .spot.back::after { display: none; }
+.shelf.hiding .spot { opacity: 0; }
+.curtain { pointer-events: none !important; opacity: 0; }
+.curtain.show { animation: puff 1.6s ease-out 1 forwards; }
+
+/* ---------- 5: GWIAZDKI ---------- */
+.sky {
+  overflow: hidden;
+  border-radius: 44px;
+  border: 6px solid var(--gold);
+  background:
+    radial-gradient(circle, rgba(255,240,190,.55) 1.5px, transparent 2.5px) 0 0 / 60px 60px,
+    radial-gradient(ellipse at 50% 20%, rgba(70,30,120,.82) 0%, rgba(25,10,50,.9) 100%);
+  box-shadow: 0 8px 0 var(--gold-dark), 0 0 0 10px rgba(122,47,192,.5), 0 20px 40px rgba(0,0,0,.45);
+}
+.sprite {
+  position: absolute; left: 0; top: 0;
+  width: 150px; height: 150px;
+  padding: 0; border: 0; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,240,190,.18) 0%, rgba(255,240,190,0) 70%);
+  cursor: pointer;
+  touch-action: manipulation;
+  will-change: transform;
+}
+.sprite img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 6px 8px rgba(0,0,0,.5)); }
+.sprite:focus-visible { outline: 6px solid var(--gold); outline-offset: 4px; }
+.sprite.caught { opacity: 0; transition: opacity .3s; pointer-events: none; }
+.sprite.nope img { animation: shake .55s ease-in-out 1; }
+.star-count { display: flex; gap: 14px; align-items: center; padding: 8px 22px; border-radius: 40px; background: rgba(23,10,40,.7); border: 4px solid var(--gold); z-index: 3; }
+.star-count i { position: relative; width: 66px; height: 66px; border-radius: 50%; border: 4px dashed rgba(255,214,120,.6); }
+.star-count i img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; transform: scale(.4); transition: opacity .4s, transform .5s cubic-bezier(.34,1.56,.64,1); }
+.star-count i.on { border-color: transparent; }
+.star-count i.on img { opacity: 1; transform: scale(1.15); }
+
+/* ---------- 6: ELIKSIR ---------- */
+.recipe-col { padding: 16px 14px; display: flex; flex-direction: column; gap: 6px; }
+.recipe-col h3 { margin: 0 0 4px; text-align: center; font-size: 30px; color: var(--purple); }
+.recipe-col .step { display: flex; align-items: center; gap: 12px; padding: 4px 10px; border-radius: 22px; transition: background .3s; }
+.recipe-col .step .n { width: 46px; height: 46px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; background: var(--purple); color: #fff; font-size: 28px; font-weight: 800; border: 3px solid var(--gold); }
+.recipe-col .step img { width: 70px; height: 70px; object-fit: contain; }
+.recipe-col .step .check { margin-left: auto; width: 40px; height: 40px; opacity: 0; }
+.recipe-col .step .check path { fill: none; stroke: var(--ok); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+.recipe-col .step.current { background: rgba(255,201,60,.45); box-shadow: inset 0 0 0 4px var(--gold); }
+.recipe-col .step.done { opacity: .55; }
+.recipe-col .step.done .check { opacity: 1; }
+.recipe-col .step.hint { animation: pulse .5s ease-in-out 3; }
+
+/* ---------- Ekran końcowy ---------- */
+.end-witch { left: 40px; top: 345px; height: 700px; width: auto; animation: float 3.4s ease-in-out infinite; }
+.end-cauldron { left: 1430px; top: 540px; width: 450px; height: 500px; }
+.end-cauldron img { position: absolute; }
+.end-pot { left: 0; bottom: 0; width: 450px; }
+.end-text { left: 640px; top: 16px; width: 640px; z-index: 2; animation: popIn .9s cubic-bezier(.34,1.56,.64,1) both .2s; }
+.end-shelf { left: 0; top: 0; width: 1920px; height: 1080px; }
+.end-shelf img { position: absolute; width: 140px; height: 140px; will-change: transform; object-fit: contain; filter: drop-shadow(0 6px 8px rgba(0,0,0,.5));  }
+.btn-again { left: 410px; top: 830px; width: 500px; height: 189px; animation: pulse 2.4s ease-in-out infinite; }
+
+/* ---------- Okrągłe przyciski ---------- */
+.round-btn {
+  position: absolute; padding: 0;
+  border: 5px solid var(--gold); border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #9a4ee0 0%, #5b1d8f 60%, #3b0f63 100%);
+  box-shadow: 0 6px 0 var(--gold-dark), 0 10px 20px rgba(0,0,0,.45);
+  cursor: pointer; touch-action: manipulation;
+  transition: transform .2s ease;
+  display: flex; align-items: center; justify-content: center;
+}
+.round-btn svg { width: 62%; height: 62%; overflow: visible; }
+.round-btn svg path { fill: var(--gold); }
+.round-btn svg .wave, .round-btn svg .cross { fill: none; stroke: var(--gold); stroke-width: 4; stroke-linecap: round; }
+.round-btn svg .cross { display: none; stroke: #ffd9e4; }
+.round-btn svg .talk { fill: none; stroke: #4a1478; stroke-width: 4; stroke-linecap: round; }
+.round-btn svg .arrows { fill: none; stroke: var(--gold); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+.btn-sound[aria-pressed="true"] svg .wave { display: none; }
+.btn-sound[aria-pressed="true"] svg .cross { display: inline; }
+.btn-sound[aria-pressed="true"] { filter: saturate(.6); }
+.btn-full .shrink { display: none; }
+.btn-full[aria-pressed="true"] .expand { display: none; }
+.btn-full[aria-pressed="true"] .shrink { display: inline; }
+.round-btn:hover { transform: scale(1.07); }
+.round-btn:active { transform: scale(.95); }
+.btn-sound { left: 1686px; top: 186px; width: 92px; height: 92px; z-index: 90; }
+.btn-full  { left: 1792px; top: 186px; width: 92px; height: 92px; z-index: 90; }
+
+/* ---------- Animacje (łagodne, bez migania) ---------- */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+@keyframes popIn { 0% { opacity: 0; transform: scale(.55); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes hop { 0% { transform: translateX(-50%) translateY(0); } 40% { transform: translateX(-50%) translateY(-26px); } 100% { transform: translateX(-50%) translateY(0); } }
+@keyframes shake {
+  0%,100% { transform: translate(-50%, -50%); }
+  20% { transform: translate(calc(-50% - 14px), -50%) rotate(-4deg); }
+  40% { transform: translate(calc(-50% + 12px), -50%) rotate(3deg); }
+  60% { transform: translate(calc(-50% - 8px), -50%) rotate(-2deg); }
+  80% { transform: translate(calc(-50% + 5px), -50%); }
+}
+@keyframes shakeBox {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-14px) rotate(-3deg); }
+  40% { transform: translateX(12px) rotate(3deg); }
+  60% { transform: translateX(-8px); }
+  80% { transform: translateX(5px); }
+}
+.tile.shake { animation: shakeBox .55s ease-in-out 1; }
+.sprite.nope img { animation: shakeBox .55s ease-in-out 1; }
+@keyframes wobble {
+  0% { transform: rotate(0) scale(1); }
+  20% { transform: rotate(-3deg) scale(1.03, .97); }
+  45% { transform: rotate(2.5deg) scale(.98, 1.03); }
+  70% { transform: rotate(-1.2deg) scale(1.01); }
+  100% { transform: rotate(0) scale(1); }
+}
+@keyframes glowPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+@keyframes twinkle { 0%,100% { transform: scale(1) rotate(0); opacity: .9; } 50% { transform: scale(1.08) rotate(4deg); opacity: .65; } }
+@keyframes mistDrift { 0%,100% { transform: translate(0, 0); } 50% { transform: translate(16px, -14px); } }
+@keyframes bubblesRise { 0% { transform: translateY(40px) scale(.7); opacity: 0; } 25% { opacity: .9; } 100% { transform: translateY(-110px) scale(1.05); opacity: 0; } }
+@keyframes puff { 0% { opacity: 0; transform: scale(.4) translateY(40px); } 30% { opacity: 1; transform: scale(1) translateY(0); } 100% { opacity: 0; transform: scale(1.25) translateY(-70px); } }
+
+/* ---------- Ograniczony ruch ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0s !important;
+    transition-duration: .15s !important;
+  }
+  .fx-smoke.puff, .curtain.show { animation: none !important; opacity: 0; }
+  .tile:hover:not(:disabled), .tile:focus-visible { transform: none; }
+  .card-inner { transition: none !important; }
+}
+
+/* Przycisk „Zagraj w inną grę” (link) */
+.btn-other { position: absolute; display: block; left: 950px; top: 838px; width: 540px; height: 180px; animation: pulse 2.4s ease-in-out 1.2s infinite; }
+.btn-other:focus { outline: none; }
+.btn-other:focus-visible { outline: 6px solid var(--gold); outline-offset: 6px; }
+
+/* Logo ePedagogiki na białej apli */
+.brand {
+  position: absolute; left: 22px; top: 996px; z-index: 85;
+  width: 244px; height: 62px; overflow: hidden;
+  background: #fff; border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+  pointer-events: none;
+}
+.brand img { position: absolute; left: 8.3px; top: -12.2px; width: 238.3px; height: auto; }

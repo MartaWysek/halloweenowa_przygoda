@@ -1,0 +1,53 @@
+HALLOWEENOWY KOCIOŁEK CZAROWNICY – PRZYGODA W SZEŚCIU PRÓBACH
+=============================================================
+
+Statyczna gra HTML5 (HTML + CSS + czysty JavaScript). Bez bibliotek, bez kompilacji,
+bez połączeń z zewnętrznymi serwerami, bez ciasteczek i bez zbierania danych.
+
+URUCHOMIENIE NA WŁASNYM KOMPUTERZE
+1. Rozpakuj ZIP.
+2. Otwórz folder "halloweenowy-kociolek-przygoda" i kliknij dwukrotnie plik index.html.
+   Gra otworzy się w przeglądarce (Chrome, Edge, Firefox, Safari).
+
+PUBLIKACJA NA SERWERZE (administrator CMS ePedagogika)
+1. Skopiuj CAŁY folder "halloweenowy-kociolek-przygoda" na serwer, zachowując strukturę:
+   index.html, style.css, script.js oraz foldery assets/ i sounds/ obok siebie.
+2. Gra będzie dostępna pod adresem .../halloweenowy-kociolek-przygoda/index.html
+3. Do osadzenia na stronie użyj kodu z pliku iframe-embed.html (podmień ADRES_GRY).
+   Atrybut allowfullscreen jest potrzebny, żeby działał przycisk pełnego ekranu.
+Typy MIME (domyślne na Apache/nginx/IIS): .mp3 audio/mpeg, .png image/png, .jpg image/jpeg.
+Jeśli serwer wysyła X-Frame-Options lub CSP frame-ancestors, musi pozwalać na osadzenie
+gry na stronach ePedagogiki (np. X-Frame-Options: SAMEORIGIN, gdy gra jest w tej samej domenie).
+
+PRZEBIEG GRY
+Menu główne → przed każdą próbą karta z instrukcją i przyciskiem START.
+Każda rozgrywka jest inna: przedmioty, zagadki, pary, receptury i nagrody są losowane
+przy każdym podejściu (nagrody nigdy się nie powtarzają).
+Do kociołka trafiają wyłącznie przedmioty – nigdy zwierzęta ani stworki (kot, sowa,
+nietoperz, żabka, pająk, duszek pojawiają się tylko jako rozpraszacze, w memory i na półce).
+1. Zagadka obrazkowa – zagadka o jednym z przedmiotów; wybór spośród 4 obrazków
+   (przeciąganie do kociołka lub kliknięcie). Nagroda: odgadnięty przedmiot.
+2. Memory – 6 kart (3 losowe pary); najpierw 5 sekund podglądu, potem karty się odwracają.
+3. Magiczna kolejność – losowa receptura z 3 składników; bez limitu czasu, przycisk
+   ZAPAMIĘTAŁEM/AM i w razie potrzeby „Pokaż recepturę”. Nagroda: ostatni składnik receptury.
+4. Co zniknęło? – 5 przedmiotów, przycisk GOTOWE, jeden znika; wybór z 3 odpowiedzi.
+   Nagrodą jest przedmiot, który zniknął.
+5. Złap magiczne gwiazdki – 3 gwiazdki wśród poruszających się przedmiotów;
+   „Tryb spokojny” zatrzymuje ruch (domyślnie włączony przy ustawieniu „ogranicz ruch”).
+6. Przygotowanie eliksiru – czarownica dokłada losowy sekretny składnik; dziecko wrzuca
+   6 składników do kociołka według obrazkowej receptury. Na końcu fanfara i ekran końcowy
+   z fruwającymi składnikami oraz przyciskami ZAGRAJ JESZCZE RAZ i ZAGRAJ W INNĄ GRĘ
+   (link do https://epedagogika.pl/slowa-kluczowe/gra-interaktywna-8743 – otwiera się
+   w całym oknie przeglądarki, także gdy gra jest osadzona w iframe).
+Po każdej wygranej nagroda przylatuje z lewego dolnego rogu i przez ok. 2 s pokazuje się
+przy niej jeden losowy efekt (iskierki, bąbelki albo mgiełka), który potem łagodnie znika.
+Brak punktów, limitu czasu i przegranej. Błąd = delikatny komunikat i kolejna próba.
+DALEJ pojawia się dopiero po ukończeniu próby. W lewym dolnym rogu logo ePedagogika.pl.
+
+Sterowanie: mysz, dotyk, klawiatura (Tab + Enter/Spacja).
+Przyciski stałe: domek (menu główne), głośnik (dźwięk wł./wył.), strzałki (pełny ekran).
+
+PLIKI
+assets/backgrounds, characters, cauldron, items, ui, effects – oryginalne grafiki (PNG; tła JPG)
+sounds/ – efekty dźwiękowe MP3: klik, podnies, szum, plusk, bulgot, magia, blad, fanfara
+Treści poleceń i ustawienia prób znajdują się w script.js (sekcja „SZEŚĆ MINIGIER”).

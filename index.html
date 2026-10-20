@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Halloweenowy kociołek czarownicy</title>
+  <meta name="description" content="Halloweenowa przygoda dla dzieci: sześć magicznych prób i wspólne warzenie eliksiru.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!--GAME-START-->
+  <div id="viewport">
+    <main id="stage">
+
+      <!-- ===== MENU GŁÓWNE ===== -->
+      <section id="screen-start" class="screen is-active" aria-label="Menu główne">
+        <img class="bg" src="assets/backgrounds/tlo_start.jpg" alt="" draggable="false">
+        <img class="start-title" src="assets/ui/baner_tytul.png" alt="Halloweenowy kociołek czarownicy" draggable="false">
+        <img class="start-witch" src="assets/characters/czarownica.png" alt="Czarownica" draggable="false">
+        <img class="start-cauldron" src="assets/cauldron/kociolek.png" alt="" draggable="false">
+        <div class="start-instruction">
+          <img src="assets/ui/baner_polecenie.png" alt="" draggable="false">
+          <p>Czarownica chce uwarzyć niezwykły eliksir! Przejdź z nią sześć magicznych prób, zdobądź składniki i&nbsp;przygotuj miksturę.</p>
+        </div>
+        <button id="btn-start" class="img-btn btn-start" type="button" aria-label="Start" disabled>
+          <img src="assets/ui/przycisk_start.png" alt="" draggable="false">
+        </button>
+        <p id="loading" class="loading" role="status">Ładowanie magii…</p>
+      </section>
+
+      <!-- ===== PRZYGODA (wspólna rama dla 6 prób) ===== -->
+      <section id="screen-game" class="screen" aria-label="Magiczne próby" hidden>
+        <img class="bg" src="assets/backgrounds/tlo_gra.jpg" alt="" draggable="false">
+
+        <div class="game-banner">
+          <img src="assets/ui/baner_polecenie.png" alt="" draggable="false">
+          <h1 id="task-text" aria-live="polite"></h1>
+        </div>
+
+        <div class="progress">
+          <span id="progress-label" class="progress-label" aria-live="polite">Magiczna próba 1/6</span>
+          <span id="inventory" class="inventory" aria-label="Zdobyte składniki"></span>
+        </div>
+
+        <div class="game-witch" aria-hidden="true">
+          <img class="witch-a" src="assets/characters/czarownica.png" alt="" draggable="false">
+          <img class="witch-b" src="assets/characters/czarownica_radosna.png" alt="" draggable="false">
+        </div>
+        <div id="say" class="say" role="status" aria-live="polite"></div>
+
+        <!-- tu każda minigra buduje swoją planszę -->
+        <div id="board" class="board"></div>
+
+        <img id="try-again" class="try-again" src="assets/effects/komunikat_sprobuj_ponownie.png" alt="" draggable="false">
+
+        <button id="btn-next" class="img-btn btn-next" type="button" aria-label="Dalej" hidden>
+          <img src="assets/ui/przycisk_dalej.png" alt="" draggable="false">
+        </button>
+
+        <!-- wprowadzenie przed każdą próbą -->
+        <div id="intro" class="intro" hidden>
+          <div class="intro-card" role="dialog" aria-modal="true" aria-labelledby="intro-title">
+            <img class="intro-frame" src="assets/effects/ramka_koniec.png" alt="" draggable="false">
+            <div class="intro-body">
+              <p id="intro-step" class="intro-step">Magiczna próba 1/6</p>
+              <h2 id="intro-title" class="intro-title">Zagadka obrazkowa</h2>
+              <p id="intro-text" class="intro-text"></p>
+              <div class="intro-reward">
+                <span id="intro-reward-label">Nagroda:</span>
+                <img id="intro-reward-img" src="assets/items/lizak.png" alt="" draggable="false">
+              </div>
+            </div>
+          </div>
+          <button id="btn-go" class="img-btn btn-go" type="button" aria-label="Zaczynamy próbę">
+            <img src="assets/ui/przycisk_start.png" alt="" draggable="false">
+          </button>
+        </div>
+
+        <!-- nagroda za próbę -->
+        <div id="reward" class="reward" aria-hidden="true">
+          <img class="reward-fx reward-spark" src="assets/effects/iskierki.png" alt="" draggable="false">
+          <img class="reward-fx reward-bubbles" src="assets/effects/babelki.png" alt="" draggable="false">
+          <img class="reward-fx reward-mist" src="assets/effects/mgielka.png" alt="" draggable="false">
+          <img id="reward-img" class="reward-img" src="assets/items/lizak.png" alt="" draggable="false">
+        </div>
+
+        <div id="fly-layer" class="fly-layer" aria-hidden="true"></div>
+
+        <button id="btn-home" class="img-btn btn-home" type="button" aria-label="Wróć do menu głównego">
+          <img src="assets/ui/przycisk_dom.png" alt="" draggable="false">
+        </button>
+      </section>
+
+      <!-- ===== EKRAN KOŃCOWY ===== -->
+      <section id="screen-end" class="screen" aria-label="Koniec przygody" hidden>
+        <img class="bg" src="assets/backgrounds/tlo_koniec.jpg" alt="" draggable="false">
+        <img class="end-text deco" src="assets/ui/komunikat_koncowy.png" alt="Brawo! Eliksir gotowy!" draggable="false">
+        <img class="end-witch" src="assets/characters/czarownica_radosna.png" alt="Radosna czarownica" draggable="false">
+        <h1 class="sr-only">Brawo! Halloweenowy eliksir jest gotowy!</h1>
+        <div class="end-cauldron deco">
+          <img class="end-pot" src="assets/cauldron/kociolek_aktywny.png" alt="" draggable="false">
+        </div>
+        <div id="end-shelf" class="end-shelf deco" aria-hidden="true"></div>
+        <button id="btn-again" class="img-btn btn-again" type="button" aria-label="Zagraj jeszcze raz">
+          <img src="assets/ui/przycisk_zagraj_ponownie.png" alt="" draggable="false">
+        </button>
+        <a id="btn-other" class="img-btn btn-other" href="https://epedagogika.pl/slowa-kluczowe/gra-interaktywna-8743" target="_top" rel="noopener" aria-label="Zagraj w inną grę">
+          <img src="assets/ui/przycisk_inna_gra.png" alt="" draggable="false">
+        </a>
+      </section>
+
+      <!-- Logo ePedagogiki – na wszystkich ekranach -->
+      <div class="brand" aria-label="ePedagogika.pl"><img src="assets/ui/logo_epedagogika.png" alt="ePedagogika.pl" draggable="false"></div>
+
+      <!-- Pełny ekran i dźwięk – na wszystkich ekranach -->
+      <button id="btn-full" class="round-btn btn-full" type="button" aria-label="Pełny ekran" aria-pressed="false" hidden>
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path class="arrows expand" d="M8 18V8h10M30 8h10v10M40 30v10H30M18 40H8V30" /><path class="arrows shrink" d="M18 8v10H8M40 18H30V8M30 40V30h10M8 30h10v10" /></svg>
+      </button>
+      <button id="btn-sound" class="round-btn btn-sound" type="button" aria-label="Wycisz dźwięki" aria-pressed="false">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 18h8l11-8v28l-11-8H8z" /><path class="wave" d="M32 17c3 2 4.5 4.5 4.5 7s-1.5 5-4.5 7M36.5 11.5c5 3.5 7.5 7.8 7.5 12.5s-2.5 9-7.5 12.5" /><path class="cross" d="M33 17l12 14M45 17L33 31" /></svg>
+      </button>
+
+    </main>
+  </div>
+<!--GAME-END-->
+  <script src="script.js"></script>
+</body>
+</html>
